@@ -16,9 +16,10 @@ let duration = moment.duration(requiredDateForCalc.diff(startDateForCalc));
 let days = duration.asDays();
 
 const url =
-  "https://bipad.gov.np/api/v1/covid19-case/?district=38&expand=district%2Cnationality&limit=1000000000";
+  "https://bipadportal.gov.np/api/v1/covid19-case/?district=5&expand=district%2Cnationality&limit=-1";
 
 let fetchResults = async () => {
+  console.log("Please wait!!");
   const response = await request({
     uri: url,
     headers: {
@@ -38,14 +39,46 @@ let fetchResults = async () => {
       (acc, val) => {
         if (val.deathOn == startDate) {
           acc.deaths = acc.deaths + 1;
+
+          if (val.gender == "male" || val.gender == "Male") {
+            acc.maleDeath = acc.maleDeath + 1;
+          } else if (val.gender == "female" || val.gender == "Female") {
+            acc.femaleDeath = acc.femaleDeath + 1;
+          } else {
+            console.log("___________FINAL ELSE 1 death_____________");
+            console.log(val);
+
+            acc.unknownDeath = acc.unknownDeath + 1;
+          }
         }
         if (val.recoveredOn == startDate) {
           acc.recovered = acc.recovered + 1;
+
+          if (val.gender == "male" || val.gender == "Male") {
+            acc.maleRecovered = acc.maleRecovered + 1;
+          } else if (val.gender == "female" || val.gender == "Female") {
+            acc.femaleRecovered = acc.femaleRecovered + 1;
+          } else {
+            console.log("___________FINAL ELSE 2 recovered_____________");
+            console.log(val);
+
+            acc.unknownRecovered = acc.unknownRecovered + 1;
+          }
         }
 
         return acc;
       },
-      { date: startDate, deaths: 0, recovered: 0 }
+      {
+        date: startDate,
+        deaths: 0,
+        recovered: 0,
+        maleDeath: 0,
+        femaleDeath: 0,
+        unknownDeath: 0,
+        maleRecovered: 0,
+        femaleRecovered: 0,
+        unknownRecovered: 0,
+      }
     );
     finalArray.push(resultObj);
     startDate = moment(startDate, "YYYY-MM-DD")
@@ -60,7 +93,7 @@ let fetchResults = async () => {
   const wb = xlsx.utils.book_new();
   const ws = xlsx.utils.json_to_sheet(finalArray);
   xlsx.utils.book_append_sheet(wb, ws);
-  xlsx.writeFile(wb, "defaultAdditionalInfo.xlsx");
+  xlsx.writeFile(wb, "morang.xlsx");
 };
 
 fetchResults();
