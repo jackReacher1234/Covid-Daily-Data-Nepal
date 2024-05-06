@@ -10,4 +10,4 @@ The steps are pretty easy.
 5) Run "node ." or "node index.js" in command prompt.
 6) Wait for a while. The data will be saved in same folder in .xlsx format.
 
-Hope this helps. If this helps you make sure to star this repository.
+Hope this helps.
